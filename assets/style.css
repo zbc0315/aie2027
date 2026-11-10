@@ -250,50 +250,13 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .hero .hero__cta .btn--ghost { background: transparent; border-color: rgba(255, 255, 255, 0.34); color: #FFFFFF; }
 .hero .hero__cta .btn--ghost:hover { border-color: #FFFFFF; background: rgba(255, 255, 255, 0.1); color: #FFFFFF; }
 
-/* hero visual — 三维蜂窝剖面
-   顶层是开口的蜂窝面，下面几层是不透明的实体材质，
-   沿 Z 轴叠出差厚；整体在 perspective 里倾斜，读作一块被剖开的蜂窝板。 */
-.honey {
-  position: relative; width: 100%; max-width: 470px; min-width: 0;
+/* hero visual — 自组装点阵（绘制在 assets/main.js） */
+.lattice {
+  display: block; width: 100%; max-width: 470px; min-width: 0;
   margin-left: auto; justify-self: end;
-  aspect-ratio: 1 / 1; perspective: 1200px; perspective-origin: 50% 46%;
-}
-.honey__slab {
-  position: absolute; inset: 0;
-  transform-style: preserve-3d;
-  transform: rotateX(52deg) rotateZ(-18deg) scale(1.16);
-  animation: slabTurn 26s ease-in-out infinite alternate;
-}
-.honey__plane { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-
-/* 厚度层：不透明深色，构成侧壁 */
-.honey__plane--z1 { transform: translateZ(-9px); }
-.honey__plane--z2 { transform: translateZ(-18px); }
-.honey__plane--z3 { transform: translateZ(-27px); }
-/* 实体本体：不画蜂窝格，只留连续色块，切面露出来的应该是「材料」而不是另一张网 */
-.honey__plane--z1 .honey__cell,
-.honey__plane--z2 .honey__cell,
-.honey__plane--z3 .honey__cell {
-  fill: #10263D; fill-opacity: 1; stroke: none;
-}
-.honey__plane--z2 .honey__cell { fill: #0D2035; }
-.honey__plane--z3 .honey__cell { fill: #0B1B2D; }
-
-/* 顶层切掉一角，露出下面的实体层 —— 这一刀就是剖面 */
-.honey__plane--top { clip-path: polygon(0 0, 100% 0, 100% 46%, 40% 100%, 0 100%); }
-.honey__plane--top .honey__cell {
-  fill: #7EA3C6; fill-opacity: .10;
-  stroke: #BCD5EA; stroke-opacity: .72; stroke-width: 1.1;
-}
-.honey__plane--top .honey__cell--live { animation: cellLight 7.5s ease-in-out infinite; }
-
-@keyframes cellLight {
-  0%, 100% { fill-opacity: .10; stroke-opacity: .68; }
-  45%      { fill-opacity: .58; stroke-opacity: 1; }
-}
-@keyframes slabTurn {
-  from { transform: rotateX(52deg) rotateZ(-18deg) scale(1.16); }
-  to   { transform: rotateX(49deg) rotateZ(-14deg) scale(1.16); }
+  aspect-ratio: 1 / 1;
+  /* 深底上给一层极淡的外发光，让点在边缘也有存在感 */
+  filter: drop-shadow(0 0 26px rgba(126, 163, 198, 0.16));
 }
 
 /* deadline strip */
@@ -521,7 +484,7 @@ table.data tbody tr:hover { background: var(--navy-tint); }
 /* ---------- 19. Responsive ---------- */
 @media (max-width: 1024px) {
   .hero__grid { grid-template-columns: 1fr; }
-  .honey { max-width: 320px; margin: var(--space-6) auto 0; order: -1; opacity: .95; }
+  .lattice { max-width: 320px; margin: var(--space-6) auto 0; order: -1; opacity: .95; }
   .footer-grid { grid-template-columns: 1fr 1fr; }
   .nav { display: none; }
   .nav-toggle { display: block; margin-left: auto; }
@@ -553,7 +516,7 @@ table.data tbody tr:hover { background: var(--navy-tint); }
   .split, .split--wide { grid-template-columns: 1fr; gap: var(--space-5); }
   .cta-band .wrap { grid-template-columns: 1fr; }
   .hero { min-height: auto; padding: 96px 0 var(--space-8); }
-  .honey { max-width: 240px; margin: -8px auto -24px; }
+  .lattice { max-width: 250px; margin: -6px auto -18px; }
 }
 
 @media (max-width: 520px) {
