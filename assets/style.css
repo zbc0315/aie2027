@@ -204,7 +204,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 }
 .hero .wrap { position: relative; z-index: 2; }
 
-.hero__grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--space-7); align-items: center; }
+.hero__grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); gap: var(--space-7); align-items: center; }
 
 .hero__kicker { display: flex; align-items: center; gap: 14px; margin-bottom: var(--space-6); }
 .hero__kicker, .hero .kicker { color: rgba(255, 255, 255, 0.66); }
@@ -250,34 +250,50 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .hero .hero__cta .btn--ghost { background: transparent; border-color: rgba(255, 255, 255, 0.34); color: #FFFFFF; }
 .hero .hero__cta .btn--ghost:hover { border-color: #FFFFFF; background: rgba(255, 255, 255, 0.1); color: #FFFFFF; }
 
-/* aggregate visual — 深底上的球体：提亮 + 冷光晕 */
-.cluster { position: relative; aspect-ratio: 1 / 1; width: 100%; max-width: 460px; margin-left: auto; }
-.cluster__glow {
-  position: absolute; inset: 6%; border-radius: 50%;
-  background: radial-gradient(circle at 44% 40%, rgba(147, 190, 225, 0.3), rgba(126, 163, 198, 0.13) 45%, transparent 72%);
-  filter: blur(30px);
+/* hero visual — 三维蜂窝剖面
+   顶层是开口的蜂窝面，下面几层是不透明的实体材质，
+   沿 Z 轴叠出差厚；整体在 perspective 里倾斜，读作一块被剖开的蜂窝板。 */
+.honey {
+  position: relative; width: 100%; max-width: 470px; min-width: 0;
+  margin-left: auto; justify-self: end;
+  aspect-ratio: 1 / 1; perspective: 1200px; perspective-origin: 50% 46%;
 }
-.cluster i {
-  position: absolute; border-radius: 50%; display: block;
-  background: radial-gradient(circle at 34% 28%, #FFFFFF 0%, #BAD2E7 20%, #7BA2C8 48%, #3D6C9C 76%, #173F6D 100%);
-  box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.5), inset 0 -2px 8px rgba(10, 35, 64, 0.3), 0 0 26px rgba(126, 163, 198, 0.16);
-  animation: float 9s var(--ease) infinite alternate;
+.honey__slab {
+  position: absolute; inset: 0;
+  transform-style: preserve-3d;
+  transform: rotateX(52deg) rotateZ(-18deg) scale(1.16);
+  animation: slabTurn 26s ease-in-out infinite alternate;
 }
-.cluster i:nth-child(2) { width: 13%; height: 13%; left: 40%; top: 34%; }
-.cluster i:nth-child(3) { width: 8%;  height: 8%;  left: 54%; top: 26%; animation-delay: -1.2s; }
-.cluster i:nth-child(4) { width: 6%;  height: 6%;  left: 33%; top: 51%; animation-delay: -2.4s; }
-.cluster i:nth-child(5) { width: 10%; height: 10%; left: 58%; top: 48%; animation-delay: -3.1s; }
-.cluster i:nth-child(6) { width: 5%;  height: 5%;  left: 47%; top: 60%; animation-delay: -4.3s; }
-.cluster i:nth-child(7) { width: 4%;  height: 4%;  left: 62%; top: 63%; animation-delay: -0.7s; }
-.cluster i:nth-child(8) { width: 3.4%;height: 3.4%;left: 30%; top: 33%; animation-delay: -5.2s; }
-.cluster i:nth-child(9) { width: 3%;  height: 3%;  left: 66%; top: 37%; animation-delay: -2.9s; }
-.cluster i:nth-child(10){ width: 2.4%;height: 2.4%;left: 39%; top: 66%; animation-delay: -6.1s; }
-.cluster i:nth-child(11){ width: 2%;  height: 2%;  left: 52%; top: 21%; animation-delay: -3.8s; }
-.cluster i:nth-child(12){ width: 1.6%;height: 1.6%;left: 24%; top: 45%; animation-delay: -1.6s; }
-.cluster i:nth-child(13){ width: 1.4%;height: 1.4%;left: 70%; top: 55%; animation-delay: -4.9s; }
-@keyframes float {
-  from { transform: translate3d(0, 0, 0) scale(1); }
-  to   { transform: translate3d(6px, -10px, 0) scale(1.06); }
+.honey__plane { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+
+/* 厚度层：不透明深色，构成侧壁 */
+.honey__plane--z1 { transform: translateZ(-9px); }
+.honey__plane--z2 { transform: translateZ(-18px); }
+.honey__plane--z3 { transform: translateZ(-27px); }
+/* 实体本体：不画蜂窝格，只留连续色块，切面露出来的应该是「材料」而不是另一张网 */
+.honey__plane--z1 .honey__cell,
+.honey__plane--z2 .honey__cell,
+.honey__plane--z3 .honey__cell {
+  fill: #10263D; fill-opacity: 1; stroke: none;
+}
+.honey__plane--z2 .honey__cell { fill: #0D2035; }
+.honey__plane--z3 .honey__cell { fill: #0B1B2D; }
+
+/* 顶层切掉一角，露出下面的实体层 —— 这一刀就是剖面 */
+.honey__plane--top { clip-path: polygon(0 0, 100% 0, 100% 46%, 40% 100%, 0 100%); }
+.honey__plane--top .honey__cell {
+  fill: #7EA3C6; fill-opacity: .10;
+  stroke: #BCD5EA; stroke-opacity: .72; stroke-width: 1.1;
+}
+.honey__plane--top .honey__cell--live { animation: cellLight 7.5s ease-in-out infinite; }
+
+@keyframes cellLight {
+  0%, 100% { fill-opacity: .10; stroke-opacity: .68; }
+  45%      { fill-opacity: .58; stroke-opacity: 1; }
+}
+@keyframes slabTurn {
+  from { transform: rotateX(52deg) rotateZ(-18deg) scale(1.16); }
+  to   { transform: rotateX(49deg) rotateZ(-14deg) scale(1.16); }
 }
 
 /* deadline strip */
@@ -505,7 +521,7 @@ table.data tbody tr:hover { background: var(--navy-tint); }
 /* ---------- 19. Responsive ---------- */
 @media (max-width: 1024px) {
   .hero__grid { grid-template-columns: 1fr; }
-  .cluster { max-width: 300px; margin: var(--space-6) auto 0; order: -1; opacity: .95; }
+  .honey { max-width: 320px; margin: var(--space-6) auto 0; order: -1; opacity: .95; }
   .footer-grid { grid-template-columns: 1fr 1fr; }
   .nav { display: none; }
   .nav-toggle { display: block; margin-left: auto; }
@@ -537,7 +553,7 @@ table.data tbody tr:hover { background: var(--navy-tint); }
   .split, .split--wide { grid-template-columns: 1fr; gap: var(--space-5); }
   .cta-band .wrap { grid-template-columns: 1fr; }
   .hero { min-height: auto; padding: 96px 0 var(--space-8); }
-  .cluster { max-width: 230px; margin: -12px auto -30px; }
+  .honey { max-width: 240px; margin: -8px auto -24px; }
 }
 
 @media (max-width: 520px) {
